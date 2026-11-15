@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--ARTIFACT-HEAD-->
+<title>Apollo Werkbank</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<!--/ARTIFACT-HEAD-->
+</head>
+<body>
+<!--ARTIFACT-BODY-->
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#farben" aria-label="Apollo Werkbank, zur Farbansicht">
+      <span class="sun" aria-hidden="true"></span>
+      <span class="brand-name">Apollo Werkbank</span>
+    </a>
+    <nav class="tabs" aria-label="Werkzeuge">
+      <a href="#farben" data-tab="farben">Farben</a>
+      <a href="#verlauf" data-tab="verlauf">Verlauf</a>
+      <a href="#schrift" data-tab="schrift">Schrift</a>
+      <a href="#generator" data-tab="generator">Generator</a>
+      <a href="#prompt" data-tab="prompt">Prompt</a>
+      <a href="#sammlung" data-tab="sammlung">Sammlung <span class="count" id="savedCount">0</span></a>
+    </nav>
+    <div class="strip" id="strip" role="img" aria-label="Aktive Palette"></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ───────── Farben ───────── -->
+  <section class="view" id="v-farben" aria-labelledby="h-farben">
+    <div class="viewhead">
+      <h1 id="h-farben">Farben</h1>
+      <p>Diese fünf Farben wandern mit dir durch alle Werkzeuge. Sperre, was bleiben soll, und mische den Rest neu.</p>
+    </div>
+    <div class="toolbar">
+      <label class="field inline" for="harmony"><span>Harmonie</span>
+        <select id="harmony">
+          <option value="analog">Analog</option>
+          <option value="komplement">Komplementär</option>
+          <option value="triade">Triade</option>
+          <option value="split">Teilkomplementär</option>
+          <option value="mono">Monochrom</option>
+          <option value="zufall">Zufall</option>
+        </select>
+      </label>
+      <button class="btn primary" id="mix" type="button">Neu mischen <kbd>Leertaste</kbd></button>
+      <button class="btn" id="savePalette" type="button">In Sammlung speichern</button>
+    </div>
+    <div class="swatches" id="swatches"></div>
+    <div class="cols">
+      <div class="panel">
+        <h2>Kontrast</h2>
+        <p class="hint">Alle Paarungen nach WCAG 2. Ab 4,5 : 1 trägt ein Paar Fließtext, ab 3 : 1 große Schrift.</p>
+        <div class="pairs" id="pairs"></div>
+      </div>
+      <div class="panel">
+        <h2>Export</h2>
+        <div class="seg" role="group" aria-label="Exportformat" id="exportFmt">
+          <button type="button" data-v="css">CSS</button>
+          <button type="button" data-v="tailwind">Tailwind</button>
+          <button type="button" data-v="json">JSON</button>
+        </div>
+        <pre class="code" id="exportCode" tabindex="0"></pre>
+        <button class="btn" type="button" data-copy="#exportCode">Kopieren</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── Verlauf ───────── -->
+  <section class="view" id="v-verlauf" aria-labelledby="h-verlauf" hidden>
+    <div class="viewhead">
+      <h1 id="h-verlauf">Verlauf</h1>
+      <p>Zieh die Punkte über die Fläche. Ein Doppelklick auf einen Punkt wechselt seine Farbe.</p>
+    </div>
+    <div class="work">
+      <div class="stage grad" id="gradStage">
+        <div class="grain" id="gradGrain"></div>
+      </div>
+      <div class="panel controls">
+        <div class="field"><span>Art</span>
+          <div class="seg" role="group" aria-label="Art des Verlaufs" id="gradKind">
+            <button type="button" data-v="mesh">Mesh</button>
+            <button type="button" data-v="linear">Linear</button>
+            <button type="button" data-v="conic">Konisch</button>
+          </div>
+        </div>
+        <label class="field" for="gradSoft" id="gradSoftF"><span>Weichheit <output id="gradSoftO"></output></span>
+          <input type="range" id="gradSoft" min="30" max="95" step="1">
+        </label>
+        <label class="field" for="gradAngle" id="gradAngleF"><span>Winkel <output id="gradAngleO"></output></span>
+          <input type="range" id="gradAngle" min="0" max="360" step="1">
+        </label>
+        <label class="check" for="gradGrainC"><input type="checkbox" id="gradGrainC"> Körnung (nur in der Vorschau)</label>
+        <div class="row">
+          <button class="btn primary" id="gradShuffle" type="button">Punkte würfeln</button>
+          <button class="btn" id="saveGrad" type="button">Speichern</button>
+        </div>
+        <pre class="code" id="gradCode" tabindex="0"></pre>
+        <button class="btn" type="button" data-copy="#gradCode">CSS kopieren</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── Schrift ───────── -->
+  <section class="view" id="v-schrift" aria-labelledby="h-schrift" hidden>
+    <div class="viewhead">
+      <h1 id="h-schrift">Schrift</h1>
+      <p>Ein Schriftpaar, eine Grundgröße, ein Intervall. Die Texte im Muster kannst du überschreiben.</p>
+    </div>
+    <div class="work">
+      <div class="stage specimen" id="specimen"></div>
+      <div class="panel controls">
+        <label class="field" for="typePair"><span>Schriftpaar</span>
+          <select id="typePair"></select>
+        </label>
+        <label class="field" for="typeBase"><span>Grundgröße <output id="typeBaseO"></output></span>
+          <input type="range" id="typeBase" min="14" max="22" step="1">
+        </label>
+        <label class="field" for="typeRatio"><span>Intervall</span>
+          <select id="typeRatio">
+            <option value="1.125">Große Sekunde · 1,125</option>
+            <option value="1.2">Kleine Terz · 1,2</option>
+            <option value="1.25">Große Terz · 1,25</option>
+            <option value="1.333">Quarte · 1,333</option>
+            <option value="1.5">Quinte · 1,5</option>
+            <option value="1.618">Goldener Schnitt · 1,618</option>
+          </select>
+        </label>
+        <div class="row">
+          <button class="btn" id="saveType" type="button">Speichern</button>
+        </div>
+        <pre class="code" id="typeCode" tabindex="0"></pre>
+        <button class="btn" type="button" data-copy="#typeCode">CSS kopieren</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── Generator ───────── -->
+  <section class="view" id="v-generator" aria-labelledby="h-generator" hidden>
+    <div class="viewhead">
+      <h1 id="h-generator">Generator</h1>
+      <p>Grafiken aus deiner Palette. Derselbe Startwert ergibt immer dasselbe Bild.</p>
+    </div>
+    <div class="work">
+      <div class="stage art" id="artStage"></div>
+      <div class="panel controls">
+        <div class="field"><span>Muster</span>
+          <div class="seg" role="group" aria-label="Muster" id="genAlgo">
+            <button type="button" data-v="flow">Strömung</button>
+            <button type="button" data-v="orbit">Umlaufbahn</button>
+            <button type="button" data-v="tiles">Kacheln</button>
+          </div>
+        </div>
+        <div class="field"><label for="genSeed"><span>Startwert</span></label>
+          <div class="row tight">
+            <input type="text" id="genSeed" maxlength="24" autocomplete="off" spellcheck="false">
+            <button class="btn primary" id="genRoll" type="button">Würfeln</button>
+          </div>
+        </div>
+        <label class="field" for="genDensity"><span>Dichte <output id="genDensityO"></output></span>
+          <input type="range" id="genDensity" min="5" max="100" step="1">
+        </label>
+        <div class="row">
+          <label class="field grow" for="genFormat"><span>Format</span>
+            <select id="genFormat">
+              <option>1:1</option><option>4:5</option><option>16:9</option><option>9:16</option>
+            </select>
+          </label>
+          <label class="field grow" for="genGround"><span>Grund</span>
+            <select id="genGround">
+              <option value="dark">Dunkel</option><option value="light">Hell</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <button class="btn" id="genCopy" type="button">SVG kopieren</button>
+          <button class="btn" id="saveGen" type="button">Speichern</button>
+        </div>
+        <p class="hint" id="genInfo"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── Prompt ───────── -->
+  <section class="view" id="v-prompt" aria-labelledby="h-prompt" hidden>
+    <div class="viewhead">
+      <h1 id="h-prompt">Prompt</h1>
+      <p>Bau einen Bildprompt aus Motiv, Stil und deiner Palette. Die meisten Bildmodelle verstehen Englisch am besten, deshalb entsteht der Prompt auf Englisch.</p>
+    </div>
+    <div class="work even">
+      <div class="panel controls">
+        <div class="field"><label for="pMotif"><span>Motiv</span></label>
+          <textarea id="pMotif" rows="3" placeholder="z. B. a ceramic espresso cup on a concrete ledge"></textarea>
+          <button class="btn small" id="pIdea" type="button">Zufallsidee</button>
+        </div>
+        <div id="chipGroups"></div>
+        <div class="row">
+          <label class="field grow" for="pFormat"><span>Format</span>
+            <select id="pFormat">
+              <option>1:1</option><option>4:5</option><option>3:2</option><option>16:9</option><option>9:16</option>
+            </select>
+          </label>
+        </div>
+        <label class="check" for="pPal"><input type="checkbox" id="pPal"> Aktive Palette einbauen</label>
+        <label class="check" for="pClean"><input type="checkbox" id="pClean"> Ohne Text und Wasserzeichen</label>
+      </div>
+      <div class="panel out">
+        <h2>Dein Prompt</h2>
+        <textarea id="pOut" rows="9" readonly aria-label="Fertiger Prompt"></textarea>
+        <p class="hint" id="pLen"></p>
+        <div class="row">
+          <button class="btn primary" type="button" data-copy="#pOut">Kopieren</button>
+          <button class="btn" id="savePrompt" type="button">Speichern</button>
+          <button class="btn" id="pReset" type="button">Auswahl leeren</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── Sammlung ───────── -->
+  <section class="view" id="v-sammlung" aria-labelledby="h-sammlung" hidden>
+    <div class="viewhead">
+      <h1 id="h-sammlung">Sammlung</h1>
+      <p>Alles, was du gespeichert hast. Die Sammlung liegt nur in diesem Browser.</p>
+    </div>
+    <div class="shelf" id="shelf"></div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="app.js"></script>
+<!--/ARTIFACT-BODY-->
+</body>
+</html>
